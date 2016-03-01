@@ -2,13 +2,15 @@
 	"use strict";
 
 	var words = [
-		'осень'
+		'осень',
+		'Ясень',
+		'ЁЖ'
 	];
 
 	function Data (arr) {
 		if (arr instanceof Array)
 			this.addWords(arr);
-		else if (typeof arr = 'string')
+		else if (typeof arr === 'string')
 			this.addWord(arr);
 		else
 			throw "Incorrect initial data";
@@ -17,8 +19,9 @@
 	Object.defineProperties(Data.prototype, {
 		addWord: {
 			value: function (w) {
-				if (!w || typeof w !== 'string' || /[^a-zA-Zёа-яЁА-Я].test(w)/)
+				if (!w || typeof w !== 'string' || /[^a-zA-Zёа-яЁА-Я]/.test(w))
 					throw ['Incorrect word:', w].join(' ');
+				w = w.toLowerCase();
 				var length = w.length;
 				if (!this[length])
 					this[length] = [w];
@@ -64,6 +67,6 @@
 			configurable: false
 		}
 	});
-
-	window.wordList = new Data(words);
+	
+	game.addProperty('wordList', new Data(words));
 })()

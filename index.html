@@ -4,6 +4,16 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="css/styles.css" />
 	<title>Anagrams</title>
+	<script src="js/initial.js"></script>
+	<script src="js/data.js"></script>
+
+	<script>
+		window.onload = function () {
+			console.log(game.complete(function (a, b) {return a + b;}, 1, 2));
+
+			console.log(game);
+		};
+	</script>
 </head>
 <body>
 <div id="room" class="centered">
