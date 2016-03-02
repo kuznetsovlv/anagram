@@ -26,6 +26,7 @@
 		return elem;
 	}
 
+
 	function Select() {
 		this.setOptions = function (opts, init) {
 			this.clear();
@@ -56,11 +57,20 @@
 				div.appendChild(span);
 				this.e.appendChild(div);
 
-				new Element(span).on('dradstart', function (value, self, event) {
-					console.log(arguments);
-				}).on('drag', function (value, self, event) {
-					console.log(arguments);
-				}, this);
+				new Element(span)
+				    .on('dragstart', function (value, self, event) {
+				    	this.addClass('indrag');
+				    	event.dataTransfer.effectAllowed = 'move';
+				    	this.inDrag = true;
+				    })
+				    .on('drop', function (value, self, event) {
+				    	console.log(arguments);
+				    	this.hide();
+				    })
+				    .on('dragend', function (value, self, event) {
+				    	this.removeClass('indrag');
+				    	this.inDrag = false;
+				    });
 			}
 
 			return this;
@@ -78,6 +88,19 @@
 	}
 
 	Object.defineProperties(Element.prototype, {
+		addClass: {
+			value: function (cls) {
+				if (!(new RegExp(['\\b', cls, '\b'].join('')).test(this.e.className))) {
+					var list = this.e.className.split(' ');
+					list.push(cls);
+					this.e.className = list.join(' ').trim();
+				}
+				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
 		clear: {
 			value: function () {
 				while(this.e.childNodes.length)
@@ -93,9 +116,17 @@
 			value: function (disable) {
 				if (!arguments.length)
 					disable = true;
-				return this.enable(!disable);
+				this.e.disabled = disable;
+				return this;
 			},
 			writable: false,
+			enumerable: false,
+			configurable: false
+		},
+		disabled: {
+			get: function () {
+				return this.e.disabled;
+			},
 			enumerable: false,
 			configurable: false
 		},
@@ -117,21 +148,51 @@
 			enumerable: false,
 			configurable: false
 		},
+		hide: {
+			value: function (hide) {
+				if (!arguments.length)
+					hide = true;
+				return hide ? this.addClass('hidden') : this.removeClass('hidden');
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
 		on: {
 			value: function (type, handler, context) {
 				var target = this.e,
 				    self = this,
 				    context = context || this;
+
+				function addEvent (event) {
+					return handler.call(context, target.value, self, event || window.event);
+				}
+
 				try {
-					target.addEventListener(type, function (event) {
-						return handler.call(context, target.value, self, event);
-					}, false);
+					target.addEventListener(type, addEvent, false);
 				} catch (e) {
-					target.attachEvent(['on', type].join(''), function (event) {
-						return handler.call(context, target.value, self, event || window.event);
-					});
+					target.attachEvent(['on', type].join(''), addEvent);
 				}
 				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
+		removeClass: {
+			value: function (cls) {
+				this.e.className = this.e.className.replace(cls, '').replace(/\s{2,}/g, ' ').trim();
+				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
+		show: {
+			value: function (show) {
+				if (!arguments.length)
+					show = true;
+				return show ? this.removeClass('hidden') : this.addClass('hidden');
 			},
 			writable: false,
 			enumerable: false,

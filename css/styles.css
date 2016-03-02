@@ -6,6 +6,16 @@
 	box-sizing: border-box;
 }
 
+[draggable] {
+	-moz-user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	-khtml-user-drag: element;
+	-webkit-user-drag: element;
+	cursor: move;
+}
+
 html, body {
 	background: grey;
 	height: 100%;
@@ -59,7 +69,7 @@ html, body {
 .letter {
 	height: 100%;
 	background: grey;
-	border: 1px solid black;
+	/*border: 1px solid black;*/
 	float: left;
 	margin: 0 -1px;
 }
@@ -69,7 +79,7 @@ html, body {
 	padding: 2px 5px;
 	font-size: 36px;
 	background: white;
-	outline: 1px solid black;
+	border: 1px solid black;
 	height: 100%;
 	width: 100%;
 }
@@ -83,4 +93,12 @@ p {
 	text-align: center;
 	height: 100%;
 	padding: 0 3px;
+}
+
+.indrag {
+	opacity:0.8;
+	filter:alpha(opacity=80);
+	/*transform:scale(1.2,1.2);
+	-webkit-transform:scale(1.2,1.2);
+	-ms-transform:scale(1.2,1.2);*/
 }
