@@ -1,6 +1,10 @@
 (function () {
 	"use strict";
 
+	Array.prototype.shufle = function () {
+		return this.sort(function (a, b) {return Math.random() - 0.5;});
+	}
+
 	function parseAttrs (attrs) {
 		var list='writable,enumerable,configurable'.split(',');
 		for (var i = 0, l = list.length; i < l; ++i) {

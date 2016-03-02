@@ -6,10 +6,34 @@
 	<title>Anagrams</title>
 	<script src="js/initial.js"></script>
 	<script src="js/data.js"></script>
+	<script src="js/dom.js"></script>
 
 	<script>
 		window.onload = function () {
-			console.log(game.complete(function (a, b) {return a + b;}, 1, 2));
+			game.complete(function () {
+				function options (arr) {
+					var opts = {};
+
+					for (var i = 0, l = arr.length; i < l; ++i) {
+						var opt = arr[i];
+						opts[opt] = opt;
+					}
+					return opts;
+				}
+
+				var self = this;
+
+				this.select = new this.elementCover(document.getElementsByTagName('select')[0]).setOptions(options(this.wordList.lengthes), '-Select level-').on('change', function (value, select, event) {
+					if (!value)
+						return;
+					select.disable();
+
+					if (!this.word)
+						this.word = new this.elementCover(document.getElementsByClassName('word')[0]);
+					this.word.setWord(this.wordList.getWord(value));
+
+				}, self).enable();
+			});
 
 			console.log(game);
 		};
@@ -27,7 +51,7 @@
 	</div>
 
 	<div class="anagram centered">
-		<p class="hidden">Поздравляем, вы верно разагдали анаграму!</p>
+		<p class="congratulation hidden">Поздравляем, вы верно разагдали анаграму!</p>
 		<div class="word">
 			<!-- <div class="letter">
 				<span>A</span>
@@ -39,10 +63,6 @@
 				<span>C</span>
 			</div> -->
 		</div>
-	</div>
-
-	<div class="congratulation centered hidden">
-		<p>Поздравляем, вы верно разагдали анаграму!</p>
 	</div>
 </div>
 </body>
