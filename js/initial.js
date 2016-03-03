@@ -35,6 +35,5 @@
 			}
 		}
 	});
-
 	window.game = new Container ();
 })();

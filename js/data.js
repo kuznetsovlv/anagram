@@ -1,6 +1,8 @@
 (function () {
 	"use strict";
 
+	var MIN = 2;
+
 	var words = [
 		'осень',
 		'Ясень',
@@ -19,7 +21,7 @@
 	Object.defineProperties(Data.prototype, {
 		addWord: {
 			value: function (w) {
-				if (!w || typeof w !== 'string' || /[^a-zA-Zёа-яЁА-Я]/.test(w))
+				if (!w || typeof w !== 'string' || w.length < MIN || /[^a-zA-Zёа-яЁА-Я]/.test(w))
 					throw ['Incorrect word:', w].join(' ');
 				w = w.toLowerCase();
 				var length = w.length;

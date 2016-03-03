@@ -26,13 +26,64 @@
 				this.select = new this.elementCover(document.getElementsByTagName('select')[0]).setOptions(options(this.wordList.lengthes), '-Select level-').on('change', function (value, select, event) {
 					if (!value)
 						return;
-					select.disable();
+					select.hide();
+
+					if (!this.level)
+						this.level = new this.elementCover(document.getElementsByClassName('selected_level')[0]).setText(value).show();
+
+
 
 					if (!this.word)
-						this.word = new this.elementCover(document.getElementsByClassName('word')[0]);
+						this.word = new this.elementCover(document.getElementsByClassName('word')[0]).expand(function () {
+							this.setWord = function (word) {
+								
+								if (typeof word !== 'string')
+							 		throw "Incorrect argument type, must be string.";
+
+							 	function _anagram (w) {
+									var a = w.split('').shufle();
+									return a.join('') !== w ? a : _anagram(w); 
+								}
+
+							 	this.clear();
+							 	this.word = word;
+
+							 	var anagram = _anagram(word);
+
+							 	for (var i = 0, l = anagram.length; i < l; ++i) {
+							 		this.createChild('div', {className: 'letter'})
+							 			.createChild('span', {draggable: true}, anagram[i])
+							 				.on('dragstart', function (value, self, event) {
+							 					self.addClass('indrag');
+							 					event.dataTransfer.effectAllowed = 'move';
+							 					event.dataTransfer.setData('text/plain', null);
+							 					this.inDrag = self;
+							 				}, {context: game, stopPrevent: true})
+							 				.on('drag', function (value, self, event) {
+							 					
+							 				})
+							 				.on('dragenter', function (value, self, event) {
+							 					this.addClass('drop');
+							 				})
+							 				.on('dragover', function (value, self, event) {
+							 					this.removeClass('drop');
+							 				})
+							 				.on('dragend', function (value, self, event) {
+							 					self.removeClass('indrag');
+							 				}, {context: game})
+							 				.on('drop', function (value, self, event) {
+							 					self.exchange(this.inDrag);
+							 					console.log(this.word.text, this.word.text === this.word.word);
+							 				}, {context: game});
+							 	}
+
+							 	return this;
+							}
+						});
+						
 					this.word.setWord(this.wordList.getWord(value));
 
-				}, self).enable();
+				}, {context: self}).enable();
 			});
 		};
 	</script>

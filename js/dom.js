@@ -1,77 +1,15 @@
 (function () {
 	"use strict";
 
-	function hasClass (elem, cls) {
-		var list = elem.className.split(' ');
-		for (var i = 0, l = list.length; i < l; ++i)
-			if (list[i] === cls)
-				return true;
-		return false;
-	}
-
-	function createElement (tag, attrs, text) {
-		var elem = document.createElement(tag);
-		if (attrs && typeof attrs !== 'object') {
-			text = attrs;
-			attrs = undefined;
-		}
-
-		if (attrs)
-			for (var attr in attrs)
-				elem[attr] = attrs[attr];
-
-		if (text || text === 0)
-			elem.appendChild(document.createTextNode(text));
-
-		return elem;
-	}
-
-
 	function Select() {
 		this.setOptions = function (opts, init) {
 			this.clear();
 
 			if (init !== undefined)
-				this.e.appendChild(createElement('option', {value: ''}, init));
+				this.createChild('option', {value: ''}, init);
 
 			for (var key in opts)
-				this.e.appendChild(createElement('option', {value: key}, opts[key]));
-
-			return this;
-		}
-	}
-
-	function Word() {
-		this.setWord = function (word) {
-			if (typeof word !== 'string')
-				throw "Incorrect argument type, must be string.";
-
-			this.clear();
-			this.word = word;
-
-			var anagram = word.split('').shufle();
-
-			for (var i = 0, l = anagram.length; i < l; ++i) {
-				var div = createElement('div', {className: 'letter'}),
-				    span = createElement('span', {draggable: true}, anagram[i]);
-				div.appendChild(span);
-				this.e.appendChild(div);
-
-				new Element(span)
-				    .on('dragstart', function (value, self, event) {
-				    	this.addClass('indrag');
-				    	event.dataTransfer.effectAllowed = 'move';
-				    	this.inDrag = true;
-				    })
-				    .on('drop', function (value, self, event) {
-				    	console.log(arguments);
-				    	this.hide();
-				    })
-				    .on('dragend', function (value, self, event) {
-				    	this.removeClass('indrag');
-				    	this.inDrag = false;
-				    });
-			}
+				this.createChild('option', {value: key}, opts[key]);
 
 			return this;
 		}
@@ -82,9 +20,6 @@
 
 		if (elem.tagName.toLowerCase() === 'select')
 			Select.call(this);
-		if (hasClass(elem, 'word'))
-			Word.call(this);
-
 	}
 
 	Object.defineProperties(Element.prototype, {
@@ -111,6 +46,29 @@
 			enumerable: false,
 			configurable: false
 
+		},
+		createChild: {
+			value: function (name, attrs, text) {
+				var child = document.createElement(name);
+				if (attrs && typeof attrs !== 'object') {
+					text = attrs;
+					attrs = undefined;
+				}
+
+				if (attrs)
+					for (var attr in attrs)
+				child[attr] = attrs[attr];
+
+				if (text || text === 0)
+					child.appendChild(document.createTextNode(text));
+
+				this.e.appendChild(child);
+
+				return new Element(child);
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
 		},
 		disable: {
 			value: function (disable) {
@@ -148,6 +106,33 @@
 			enumerable: false,
 			configurable: false
 		},
+		exchange: {
+			value: function (elem) {
+				var parentNode = this.e.parentNode;
+				elem.e.parentNode.appendChild(this.e);
+				parentNode.appendChild(elem.e);
+				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
+		expand: {
+			value: function (v) {
+				switch (typeof v) {
+					case 'object':
+						for (var key in v)
+							this[key] = v[key];
+						break;
+					case 'function': v.apply(this, Array.prototype.slice.call(arguments, 1)); break;
+					default: this[v] = v;
+				}
+				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
 		hide: {
 			value: function (hide) {
 				if (!arguments.length)
@@ -159,13 +144,31 @@
 			configurable: false
 		},
 		on: {
-			value: function (type, handler, context) {
+			value: function (type, handler, opts) {
+				opts = opts || {};
 				var target = this.e,
-				    self = this,
-				    context = context || this;
+				    self = this;
 
 				function addEvent (event) {
-					return handler.call(context, target.value, self, event || window.event);
+					event = event || window.event;
+
+					if (!opts.stopPrevent) {
+						try {
+							event.preventDefault();
+						} catch (e) {
+							event.returnValue = false;
+						}
+					}
+
+					if (opts.noBubble) {
+							try {
+								event.stopPropagation();
+							} catch (e) {
+								event.cancelBubble = true;
+							}
+					}
+
+					return handler.call(opts.context || self, target.value, self, event);
 				}
 
 				try {
@@ -188,6 +191,15 @@
 			enumerable: false,
 			configurable: false
 		},
+		setText: {
+			value: function (txt) {
+				this.text = txt;
+				return this;
+			},
+			writable: false,
+			enumerable: false,
+			configurable: false
+		},
 		show: {
 			value: function (show) {
 				if (!arguments.length)
@@ -195,6 +207,16 @@
 				return show ? this.removeClass('hidden') : this.addClass('hidden');
 			},
 			writable: false,
+			enumerable: false,
+			configurable: false
+		},
+		text: {
+			set: function (txt) {
+				this.clear().e.appendChild(document.createTextNode(txt));
+			},
+			get: function () {
+				return this.e.textContent;
+			},
 			enumerable: false,
 			configurable: false
 		},
