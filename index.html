@@ -53,8 +53,11 @@
 										.createChild('span', {draggable: true}, anagram[i])
 											.on('dragstart', function (value, self, event) {
 												self.addClass('indrag');
-												// event.dataTransfer.effectAllowed = 'move';
-												//event.dataTransfer.setData('text/plain', 'txt');
+												try {
+													event.dataTransfer.effectAllowed = 'move';
+													event.dataTransfer.setData('text/plain', 'txt');
+												} catch (e) {}
+												
 												this.inDrag = self;
 											}, {context: game, stopPrevent: true})
 											.on('drag', function (value, self, event) {
