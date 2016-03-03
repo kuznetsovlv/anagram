@@ -25,11 +25,7 @@
 	Object.defineProperties(Element.prototype, {
 		addClass: {
 			value: function (cls) {
-				if (!(new RegExp(['\\b', cls, '\b'].join('')).test(this.e.className))) {
-					var list = this.e.className.split(' ');
-					list.push(cls);
-					this.e.className = list.join(' ').trim();
-				}
+				this.e.classList.add(cls);
 				return this;
 			},
 			writable: false,
@@ -184,7 +180,7 @@
 		},
 		removeClass: {
 			value: function (cls) {
-				this.e.className = this.e.className.replace(cls, '').replace(/\s{2,}/g, ' ').trim();
+				this.e.classList.remove(cls);
 				return this;
 			},
 			writable: false,
@@ -232,5 +228,21 @@
 		}
 	});
 
-	game.addProperty('elementCover', Element);
+	game.addProperty('ElementCover', Element);
+
+	game.addProperty('getElementByClass', function (cls, n) {
+		n = n || 0;
+		var list = document.getElementsByClassName(cls),
+		    length = list.length;
+
+		if (!length)
+			return undefined;
+
+		while (n < 0)
+			n = length - n;
+		while (n > length)
+			n -= length;
+
+		return this.ElementCover ? new this.ElementCover(list[n]) : list[n];
+	});
 })();

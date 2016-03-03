@@ -23,61 +23,76 @@
 
 				var self = this;
 
-				this.select = new this.elementCover(document.getElementsByTagName('select')[0]).setOptions(options(this.wordList.lengthes), '-Select level-').on('change', function (value, select, event) {
+				this.select = new this.ElementCover(document.getElementsByTagName('select')[0]).setOptions(options(this.wordList.lengthes), '-Select level-').on('change', function (value, select, event) {
 					if (!value)
 						return;
 					select.hide();
 
-					if (!this.level)
-						this.level = new this.elementCover(document.getElementsByClassName('selected_level')[0]).setText(value).show();
+					(this.congratulation || (this.congratulation = this.getElementByClass('congratulation'))).hide();
 
+					(this.level || (this.level = this.getElementByClass('selected_level'))).setText(value).show();
 
-
-					if (!this.word)
-						this.word = new this.elementCover(document.getElementsByClassName('word')[0]).expand(function () {
+					(this.word || (this.word = this.getElementByClass('word'))).expand(function () {
 							this.setWord = function (word) {
 								
 								if (typeof word !== 'string')
-							 		throw "Incorrect argument type, must be string.";
+									throw "Incorrect argument type, must be string.";
 
-							 	function _anagram (w) {
+								function _anagram (w) {
 									var a = w.split('').shufle();
 									return a.join('') !== w ? a : _anagram(w); 
 								}
 
-							 	this.clear();
-							 	this.word = word;
+								this.clear();
+								this.word = word;
 
-							 	var anagram = _anagram(word);
+								var anagram = _anagram(word);
 
-							 	for (var i = 0, l = anagram.length; i < l; ++i) {
-							 		this.createChild('div', {className: 'letter'})
-							 			.createChild('span', {draggable: true}, anagram[i])
-							 				.on('dragstart', function (value, self, event) {
-							 					self.addClass('indrag');
-							 					event.dataTransfer.effectAllowed = 'move';
-							 					//event.dataTransfer.setData('text/plain', 'txt');
-							 					this.inDrag = self;
-							 				}, {context: game, stopPrevent: true})
-							 				.on('drag', function (value, self, event) {
-							 					
-							 				}, {stopPrevent: true})
-							 				.on('dragenter', function (value, self, event) {
-							 					this.addClass('drop');
-							 				})
-							 				.on('dragover', function (value, self, event) {
-							 					this.removeClass('drop');
-							 				})
-							 				.on('dragend', function (value, self, event) {
-							 					self.removeClass('indrag');
-							 				}, {context: game})
-							 				.on('drop', function (value, self, event) {
-							 					self.exchange(this.inDrag);
-							 					console.log(this.word.text, this.word.text === this.word.word);
-							 				}, {context: game});
-							 	}
+								for (var i = 0, l = anagram.length; i < l; ++i) {
+									this.createChild('div', {className: 'letter'})
+										.createChild('span', {draggable: true}, anagram[i])
+											.on('dragstart', function (value, self, event) {
+												self.addClass('indrag');
+												// event.dataTransfer.effectAllowed = 'move';
+												//event.dataTransfer.setData('text/plain', 'txt');
+												this.inDrag = self;
+											}, {context: game, stopPrevent: true})
+											.on('drag', function (value, self, event) {
+												
+											}, {stopPrevent: true})
+											.on('dragenter', function (value, self, event) {
+												this.addClass('drop');
+											})
+											.on('dragover', function (value, self, event) {
+												this.removeClass('drop');
+											})
+											.on('dragend', function (value, self, event) {
+												self.removeClass('indrag');
+											}, {context: game})
+											.on('drop', function (value, self, event) {
+												self.exchange(this.inDrag);
 
-							 	return this;
+												var word = this.word;
+												if (word.check()) {
+													word.clear();
+
+													for (var i = 0, l =word.word.length; i < l; ++i) {
+														word.createChild('div', {className: 'letter'})
+															.createChild('span', word.word[i]);
+													}
+
+													this.congratulation.show();
+													this.select.show().value = '';
+													this.level.hide();
+												}
+											}, {context: game});
+								}
+
+								return this;
+							}
+
+							this.check = function () {
+								return this.word === this.text;
 							}
 						});
 						
@@ -99,19 +114,23 @@
 		<span>.</span>
 	</div>
 
+	<div class="congratulation hidden">
+		<p>Поздравляем, вы верно разагдали анаграму!</p>
+	</div>
+
 	<div class="anagram centered">
-		<p class="congratulation hidden">Поздравляем, вы верно разагдали анаграму!</p>
 		<div class="word">
 			<!-- <div class="letter">
-				<span>A</span>
+				<span draggable>A</span>
 			</div>
 			<div class="letter">
-				<span>B</span>
+				<span draggable>B</span>
 			</div>
 			<div class="letter">
-				<span>C</span>
+				<span draggable>C</span>
 			</div> -->
 		</div>
+		
 	</div>
 </div>
 </body>
