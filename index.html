@@ -56,12 +56,12 @@
 							 				.on('dragstart', function (value, self, event) {
 							 					self.addClass('indrag');
 							 					event.dataTransfer.effectAllowed = 'move';
-							 					event.dataTransfer.setData('text/plain', null);
+							 					//event.dataTransfer.setData('text/plain', 'txt');
 							 					this.inDrag = self;
 							 				}, {context: game, stopPrevent: true})
 							 				.on('drag', function (value, self, event) {
 							 					
-							 				})
+							 				}, {stopPrevent: true})
 							 				.on('dragenter', function (value, self, event) {
 							 					this.addClass('drop');
 							 				})
