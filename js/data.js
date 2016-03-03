@@ -1,7 +1,7 @@
 (function () {
 	"use strict";
 
-	var MIN = 2;
+	var MIN = 3, MAX = 6; //Level constants
 
 	var words = [
 		'осень',
@@ -21,14 +21,16 @@
 	Object.defineProperties(Data.prototype, {
 		addWord: {
 			value: function (w) {
-				if (!w || typeof w !== 'string' || w.length < MIN || /[^a-zA-Zёа-яЁА-Я]/.test(w))
+				if (!w || typeof w !== 'string' || /[^a-zA-Zёа-яЁА-Я]/.test(w))
 					throw ['Incorrect word:', w].join(' ');
-				w = w.toLowerCase();
-				var length = w.length;
-				if (!this[length])
-					this[length] = [w];
-				else
-					this[length].push(w);
+				if (w.length >= MIN && (!MAX || w.length <= MAX)) {
+					w = w.toLowerCase();
+					var length = w.length;
+					if (!this[length])
+						this[length] = [w];
+					else
+						this[length].push(w);
+				}
 				return this;
 			},
 			writable: false,
