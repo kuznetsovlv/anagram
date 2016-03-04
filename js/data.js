@@ -40,7 +40,7 @@
 				if (!w || typeof w !== 'string' || /[^a-zA-Zёа-яЁА-Я]/.test(w))
 					throw ['Incorrect word:', w].join(' ');
 				if (w.length >= MIN && (!MAX || w.length <= MAX)) {
-					w = w.toLowerCase();
+					w = w.toUpperCase();
 					var length = w.length;
 					if (!this[length])
 						this[length] = [w];
